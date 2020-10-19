@@ -176,6 +176,7 @@ endmodule
 
 ### Registro
 
+```verilog
 // registro da N bit
 // enable e’ il controllo di scrittura
 // i0 e’ il segnale in ingresso
@@ -210,6 +211,7 @@ endmodule
 ### Test rete
 
 ```verilog
+
 module test (output z, input x, input clock)
 
     wire statocorrente;
