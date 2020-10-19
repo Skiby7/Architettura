@@ -115,4 +115,107 @@ Le direttive iniziano con `$` e permettono di salvare la traccia della simulazio
 
 * `$monitor` è come display ma refresha la variabile ogni volta che cambia
 
+# Reti Sequenziali
 
+*Riassumo prima questo capitolo perché il compitino è in vista*
+
+Le reti sequenziali servono a implementare automi mediante: 
+
+* Reti di Mealy in cui le uscite e il nuovo stato sono funzione sia degli ingressi che dello stato corrente
+
+* Reti di Moore in cui il nuovo stato interno è funzione degli ingressi e dello stato interno corrente, mentre l'uscita è solo funzione dello stato interno corrente
+
+Per implementare gli automi utilizzeremo due metodi:
+
+1. Daremo una definizione *strutturale*, in cui modelliamo il registro di stato, la rete *omega* per il calcolo delle uscite e la rete *sigma* per il calcolo del next state
+
+2. Daremo una definizione *behavioural* che rappresenta lo stato interno come `reg`, usa il blocco `always` per il calcolo del nuovo stato e usa il comando `assign` per il calcolo delle uscite.
+
+## Codici modello strutturale
+
+### Rete Omega
+
+```verilog
+module Omega(output [N-1:0] z,
+	     input 	    aluctl,
+	     input [N-1:0]  A,
+	     input [N-1:0]  B);
+
+   parameter N = 32;
+   
+   assign
+     z = (aluctl == 0 ? A+B : A-B);
+      
+endmodule
+```
+### Rete Sigma
+
+```verilog
+module Sigma(output [N-1:0] newA,
+	     output [N-1:0] newB,
+	     input 	    wea, web, mux1, mux2, aluctl,
+	     input [N-1:0]  X,
+ 	     input [N-1:0]  Y,
+	     input [N-1:0]  A,
+	     input [N-1:0]  B);
+
+   parameter N = 32;
+   
+   assign
+     newA = (wea == 0 ? A :
+	     (mux1 == 0 ? X :
+	      (aluctl == 0 ? A+B : A-B)));
+
+   assign
+     newB = (web == 0 ? B :
+	     (mux2 == 0 ? Y :
+	      (aluctl == 0 ? A+B : A-B)));
+   
+endmodule
+```
+
+### Registro
+
+// registro da N bit
+// enable e’ il controllo di scrittura
+// i0 e’ il segnale in ingresso
+// clk e’ il clock
+//
+// semantica standard: scrive i0 se clk alto e beta, uscita sempre uguale
+// al contenuto del registro
+//
+module registro(r,clk,beta,i0);
+
+parameter N = 32; // registro da 32 bit, per default
+output [N-1:0]r; // uscita del registro
+input clk; // segnale di clock
+input enable; // abilitazione alla scrittura
+input [N-1:0]i0; // valore da scrivere
+reg [N-1:0]registroN; // valore del registro
+initial // inizializzazione del registro a 0
+    begin
+        registroN = 0;
+    end
+always @ (posedge clk) // aggiornamento quando il clock va alto
+    begin
+        if(enable==1) // solo se il segnale di enable e’ a 1
+            registroN = i0;
+    end
+assign
+    r = registroN; // uscita sempre uguale al contenuto del registro
+endmodule
+
+```
+
+### Test rete
+
+```verilog
+module test (output z, input x, input clock)
+
+    wire statocorrente;
+    wire nuovostato;
+
+    registro #(1) stato(statocorrente, clock, 1'b1, nuovostato); // tutto da 1 bit
+    sigma sigma(nuovostato, x, statocorrente);
+    omega omega(z, x, statocorrente);
+```
