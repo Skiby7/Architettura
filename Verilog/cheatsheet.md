@@ -221,3 +221,7 @@ module test (output z, input x, input clock)
     sigma sigma(nuovostato, x, statocorrente);
     omega omega(z, x, statocorrente);
 ```
+
+## Codici modello behavioural
+
+Work in progress
