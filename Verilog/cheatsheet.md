@@ -115,9 +115,64 @@ Le direttive iniziano con `$` e permettono di salvare la traccia della simulazio
 
 * `$monitor` è come display ma refresha la variabile ogni volta che cambia
 
+# Reti Combinatorie
+
+Le reti combinatorie implementano *funzioni pure*, ovvero senza stato, perciò per ogni configurazione di `0` e `1` in entrata è prevista una e una sola configurazione in uscita.\
+Ci sono due modi di implementare le reti combinatorie:
+
+* Utilizzo moduli di tipo `primitive`, che hanno nel corpo la definizione della tabella di verità del componente, che però è limitata a 1 bit in uscita
+
+* Utilizzo un modulo di tipo `module` che incapsula in un programma verilog il comportamento (metodo behavioural) del componente. Non ho limiti di bit in input output
+
+## Dichiarazione di un modulo
+
+La dichiarazione di un `module` o di una `primitive` fa due scopi fondamentali:
+
+1. Definire l'interfaccia e quindi come il modulo agisce col mondo esterno.
+
+2. Definire la logica e quindi specificare il comportamento interno del modulo in modo *behavioural* o strutturale.
+
+## Moduli primitive
+
+Questi moduli si definiscono con una sequenza dei comandi:
+
+```verilog
+primitive nome_primitiva(output z, input x,input y)
+
+    table
+        0 0 : 1;
+        0 1 : 0;
+        1 0 : 0;    
+        1 1 : 1;
+    endtable
+
+endprimitive
+```
+
+In questo caso ho in ingresso due registri da 1 bit e ne restituisco uno da 1 bit.\
+Le colonne degli input rappresentano gli input nell'ordine in cui vengono dichiarati nell'intestazione 
+
+## Moduli behavioural
+
+In questo caso ho una sequenza di comandi `module` `endmodule` e all'interno specifico il comportamento della rete tramite un'espressione booleana tramite un `assign` alla l-value (output), una combinazione dei parametri in input:
+
+```verilog
+module confrontatore(output z, input x, input y)
+
+    assign
+        z = !x & !y | x & yò
+
+endmodule
+```
+
+Nell'ordine eseguo $not\rightarrow and \rightarrow or$.\
+Ricorda che: 
+* $! \rightarrow negazione\text{ }logica$ 
+
+* $\sim\text{ } \rightarrow negazione \text{ } bit \text{ } a \text{ } bit$
+
 # Reti Sequenziali
 
-*Riassumo prima questo capitolo perché il compitino è in vista*
 
 Le reti sequenziali servono a implementare automi mediante: 
 
