@@ -160,7 +160,7 @@ In questo caso ho una sequenza di comandi `module` `endmodule` e all'interno spe
 module confrontatore(output z, input x, input y)
 
     assign
-        z = !x & !y | x & yò
+        z = !x & !y | x & y;
 
 endmodule
 ```
@@ -170,6 +170,34 @@ Ricorda che:
 * $! \rightarrow negazione\text{ }logica$ 
 
 * $\sim\text{ } \rightarrow negazione \text{ } bit \text{ } a \text{ } bit$
+
+## Modello strutturale
+
+Quando la rete combinatoria produce più di un valore ma si vogliono usare le `primitive`, possiamo usare un componente `module` per astrarre il modulo che rappresenta la rete combinatoria con tutte le sue uscite.\
+Si dice strutturale perché dà un'idea della struttura in cui vengono composti i moduli. Vediamo un esempio:
+
+```verilog
+// Definizione primitive
+
+
+primitive zeta0(output z, input a, input b, input c, input d);
+    ...
+endprimitive
+
+primitive zeta1(output z, input a, input b, input c, input d);
+    ...
+endprimitive
+
+// Codice main che calcola un output di 2 bit a partire da moduli primitive
+
+
+module retecombinatoria(output [1:0]z, input [0:3]x);
+
+    zeta0 uno(z[0], x[3], x[2], x[1], x[0]);
+    zeta1 due(z[1], x[3], x[2], x[1], x[0]);
+
+endmodule
+```
 
 # Reti Sequenziali
 
