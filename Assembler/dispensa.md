@@ -12,7 +12,7 @@ title: Assembler
 
 # Introduzione
 
-Il linguaggio assembly è la forma leggibile dall'uomo del linguaggio nativo del calcolatore e ogn istruzione specifica sia l'operazione da svolgere che gli operandi coinvolti.\
+Il linguaggio assembly è la forma leggibile dall'uomo del linguaggio nativo del calcolatore e ogn istruzione specifica sia l'operazione da svolgere che gli operandi coinvolti.
 
 # Registri
 
@@ -71,3 +71,49 @@ Ci sono poi le istruzioni di traslazione:
 
 * Per la rotazione abbiamo `ROR` (per ruotare a sinistra si esegue una rotazione a destra numero di passi complementare a quelli che si vogliono fare). Le rotazioni sono come gli shift, solo che quello che trabocca, ricompare dall'altra parte, tipo Pacman.
 
+## Flag di condizione
+
+I flag possono essere:
+
+* **N:** *negative*
+
+* **Z:** *zero*
+
+* **C:** *carry*
+
+* **V:** *overflow*
+
+Questi flag vengono impostati dall'ALU sui primi 4 bit più significativi del CPRS (*Current Program Status Register*) tramite l'istruzione `CMP`, ovvero *compare*, che opera una sottrazione fra il primo e il secondo registro, deducendo dal risultato la natura dei due numeri. Ad esempio, se due numeri sono uguali, **Z** è 1 e questa condizione viene verificata anche quando si compiono operazioni come la `ADDEQ`, che esegue l'addizione solo se il flag *Z* è *true*.
+
+# Salti
+
+I salti sevono per i cicli *while*, per i blocchi condizionali *if-then-else* e per gli *switch case*. Normalmente, infatti, il program counter si incrementa di 4 alla fine di ogni istruzione, così da puntare alla successiva. però per eseguire tutti i costrutti visti sopra, questo non è possibile.\
+Esistono quindi due tipi di salti per dire al program counter di non seguire la sua logica di base, ovvero il salto semplice `B` e il salto con collegamente (*Branch and link*) `BL`. Entrambi i tipi di salto, poi, possono essere sia incondizionati che condizionati con un mnemonico.\ 
+Un esempio:
+```Assembly
+      MOV R0, #4 ; R0 = 4
+      ADD R1, R0, R0 ; R1 = R0 + R0 = 8
+      CMP R0, R1 ; sistema flag per R0−R1 = −4. NZCV = 1000
+      BEQ DEST ; non salta (Z != 1)
+      ORR R1, R1, #1 ; R1 = R1 OR 1 = 9
+DEST: ADD R1, R1, #78 ; R1 = R1 + 78 = 87
+```
+
+Il costrutto *if/else* si implementa con una `CMP` seguita da un'operazione con mnemonico, mentre il costrutto *while* con una cosa di questo genere:
+
+```Assembly
+        R0 = potenza, R1 = x
+        MOV R0, #1 ; potenza = 1
+        MOV R1, #0 ; x = 0
+WHILE: CMP R0, #128 ; potenza != 128 ?
+        BEQ FINE ; se potenza == 128, esce dal ciclo
+        LSL R0, R0, #1 ; potenza = potenza * 2
+        ADD R1, R1, #1 ; x = x + 1
+        B WHILE ; ripete il ciclo WHILE
+FINE
+```
+Il ciclo for è come il *while*, ma con una variabile di controllo.
+
+# Chiamate ai sottoprogrammi
+
+Come negli altri linguaggi di programmazione è possibile implementare delle sotto-routine per rendere il codice modulare. Per convenzione i parametri in numero inferiore o uguale a 4, vengono messi nei registri `R0-R3` prima di effettuare la chiamata.
