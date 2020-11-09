@@ -116,4 +116,14 @@ Il ciclo for è come il *while*, ma con una variabile di controllo.
 
 # Chiamate ai sottoprogrammi
 
-Come negli altri linguaggi di programmazione è possibile implementare delle sotto-routine per rendere il codice modulare. Per convenzione i parametri in numero inferiore o uguale a 4, vengono messi nei registri `R0-R3` prima di effettuare la chiamata.
+Come negli altri linguaggi di programmazione è possibile implementare delle sotto-routine per rendere il codice modulare. Per convenzione i parametri in numero inferiore o uguale a 4, vengono messi nei registri `R0-R3` prima di effettuare la chiamata.\
+ARM usa l'istruzione `BL` (*Branch and Link*) per chiamare una funzione e copiarne il contenuto del registro nel Program Counter (`MOV PC LR`). 
+
+## Stack
+
+Lo stack è una parte di memoria usata per salvare le informazioni all'interno di una funzione e può espandersi all'occorrenza, per poi contrarsi quando non ce n'è più bisogno.
+Lo stack viene implementato con una coda di tipo LIFO che al contrario della convenzione comune, si espande verso il basso: lo stack pointer di default punta a un regisro alto e si decrementa per spostarsi.\
+
+# Linguaggio Macchina
+
+Guarda sugli appunti.
