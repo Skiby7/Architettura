@@ -1,43 +1,40 @@
 		.data
-fmt: 	.string "Risultato = %d\n"
 		.text
         .global somma
 		.type somma %function
 		
-somma: 	push {r0}	
-		push {LR}
+somma: 	push {r0} @ salvo r0	
+		push {LR} @ salvo LR prima della chiamata di strlen
 		bl strlen 
-		pop {LR}
-		mov r2, r0 @sposto in r2 la len max
-		pop {r0}
-		mov r1, #0 @pulisco r1
-		mov r3, #0 @init r3
-		mov r6, #0 @init r6 for later use
+		pop {LR} @ ripristino LR
+		mov r2, r0 @sposto in r2 la lunghezza della stringa
+		pop {r0} @ ripristino in r0 l indirizzo della stringa
+		mov r1, #0 @ pulisco r1
+		mov r3, #0 @ pulisco r3
+		mov r6, #0 @ pulisco r6 che mi servirà dopo
 
-pusho: 	cmp r3, r2 @r2 variabile di controllo, r3 variabile di iterazione
+		@ La funzione pusho serve a salvare tutti i caratteri della stringa nello stack
+		
+pusho: 	cmp r3, r2 @ guardia del while(i < n) con r2 = n = strlen(string) e r3 = i
 		movge r3, #0 @ reset dei registri che mi servono dopo per la somma
-		movge r4, #0
+		movge r4, #0 @ r3 lo uso nella funzine quanto e r4 nel while successivo
 		bge sum @ mi sposto su somma
-		ldrb r5, [r0], #1
+		ldrb r5, [r0], #1 @ carico il carattere in r5 e lo salvo nello stack
 		push {r5}
-		add r3, r3, #1
+		add r3, r3, #1 
 		b pusho
 
 sum:  	cmp r4, r2
         bge fine
-        pop {r5}
-        mov r0, r5
-        bl quanto
-        add r6, r6, r0
+        pop {r0} @ prelevo il carattere dallo stack
+        push {LR} @ salvo LR
+        bl quanto @ controllo se è un numero
+        pop {LR} @ ripristino LR
+        add r6, r6, r0 @ uso r6 per salvare la somma dei numeri
         add r4, r4, #1
         b sum
 
-fine: 	@mov r1, r6
-		@push {r6}
-		@ldr r0, =fmt
-		@bl printf
-		@pop {r0}
-		mov r0, r6
-		mov r7, #1
-		mov PC, LR
+fine:	mov r0, r6 @ sposto il risultato su r0 
+		mov PC, LR @ ritorno al main.c
+	
 
